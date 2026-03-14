@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Enums\ArticleCategory;
 use App\Jobs\FetchAndStoreNewsJob;
 use App\Services\News\Strategies\NewsApiStrategy;
+use App\Services\News\Strategies\NYTimesStrategy;
 use App\Services\News\Strategies\OpenNewsStrategy;
 use Illuminate\Console\Command;
 
@@ -27,6 +28,7 @@ class AggregateNewsCommand extends Command
     protected array $sources = [
         NewsApiStrategy::class,
         OpenNewsStrategy::class,
+        NYTimesStrategy::class,
     ];
 
     /**
