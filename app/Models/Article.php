@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ArticleCategory;
 use App\Enums\NewsSource;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OpenApi\Attributes as OA;
 
@@ -27,6 +28,8 @@ use OpenApi\Attributes as OA;
 )]
 class Article extends Model
 {
+    use HasFactory;
+
     /**
      * The attributes that are mass assignable.
      *
