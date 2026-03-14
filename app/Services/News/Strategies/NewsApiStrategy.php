@@ -32,6 +32,10 @@ class NewsApiStrategy implements NewsFetcherInterface
     {
         $newsApiCategory = $this->categoryMapper->map($category);
 
+        if (is_null($newsApiCategory)) {
+            return collect();
+        }
+
         try {
             $response = Http::timeout(10)->get($this->baseUrl . '/top-headlines', [
                 'country' => 'us',
