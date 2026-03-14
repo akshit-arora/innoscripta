@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use App\Services\News\Contracts\CategoryMapperInterface;
 use App\Services\News\Mappers\NewsApiCategoryMapper;
+use App\Services\News\Mappers\OpenNewsCategoryMapper;
 use App\Services\News\Strategies\NewsApiStrategy;
+use App\Services\News\Strategies\OpenNewsStrategy;
 use Illuminate\Support\ServiceProvider;
 
 class NewsServiceProvider extends ServiceProvider
@@ -17,6 +19,10 @@ class NewsServiceProvider extends ServiceProvider
         $this->app->when(NewsApiStrategy::class)
             ->needs(CategoryMapperInterface::class)
             ->give(NewsApiCategoryMapper::class);
+
+        $this->app->when(OpenNewsStrategy::class)
+            ->needs(CategoryMapperInterface::class)
+            ->give(OpenNewsCategoryMapper::class);
     }
 
     /**

@@ -10,7 +10,7 @@ interface CategoryMapperInterface
      * Map system categories to news source categories
      *
      * @param ArticleCategory $category
-     * @return string|null
+     * @return array<string>
      */
-    public function map(ArticleCategory $category): ?string;
+    public function map(ArticleCategory $category): array;
 }

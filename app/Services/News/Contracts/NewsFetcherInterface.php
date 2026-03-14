@@ -21,4 +21,12 @@ interface NewsFetcherInterface
      * @return string
      */
     public function getSourceName(): string;
+
+    /**
+     * Check if the news source supports the given category.
+     *
+     * @param ArticleCategory $category
+     * @return bool
+     */
+    public function supportsCategory(ArticleCategory $category): bool;
 }

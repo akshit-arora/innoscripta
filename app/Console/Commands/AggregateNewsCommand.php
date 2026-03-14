@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Enums\ArticleCategory;
 use App\Jobs\FetchAndStoreNewsJob;
 use App\Services\News\Strategies\NewsApiStrategy;
+use App\Services\News\Strategies\OpenNewsStrategy;
 use Illuminate\Console\Command;
 
 class AggregateNewsCommand extends Command
@@ -25,6 +26,7 @@ class AggregateNewsCommand extends Command
 
     protected array $sources = [
         NewsApiStrategy::class,
+        OpenNewsStrategy::class,
     ];
 
     /**
@@ -37,7 +39,14 @@ class AggregateNewsCommand extends Command
         $delayCounter = 0;
 
         foreach ($this->sources as $sourceClass) {
+            $fetcher = app($sourceClass);
+
             foreach (ArticleCategory::cases() as $category) {
+                if (!$fetcher->supportsCategory($category)) {
+                    $this->line('Skipping: ' . $sourceClass . ' for category ' . $category->value);
+                    continue;
+                }
+
                 $delay = now()->addSeconds($delayCounter * 5);
                 $this->line('Queued: ' . $sourceClass . ' for category ' . $category->value . ' with delay ' . $delay->diffForHumans());
 
