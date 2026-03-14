@@ -3,6 +3,7 @@
 namespace App\DTOs;
 
 use App\Enums\ArticleCategory;
+use App\Enums\NewsSource;
 use Carbon\Carbon;
 
 class ArticleDTO
@@ -13,7 +14,7 @@ class ArticleDTO
     public function __construct(
         public string $title,
         public string $url,
-        public string $source,
+        public NewsSource $source,
         public ArticleCategory $category,
         public Carbon $publishedAt,
         public ?string $description = null,

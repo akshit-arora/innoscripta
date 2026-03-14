@@ -4,6 +4,7 @@ namespace App\Services\News\Strategies;
 
 use App\DTOs\ArticleDTO;
 use App\Enums\ArticleCategory;
+use App\Enums\NewsSource;
 use App\Services\News\Contracts\CategoryMapperInterface;
 use App\Services\News\Contracts\NewsFetcherInterface;
 use Carbon\Carbon;
@@ -57,14 +58,14 @@ class OpenNewsStrategy implements NewsFetcherInterface
                 return new ArticleDTO(
                     title: (string) $article->title,
                     url: (string) $article->link,
-                    source: $this->getSourceName(),
+                    source: $this->getSource(),
                     category: $category,
                     publishedAt: Carbon::parse((string) $article->pubDate),
                     description: isset($article->description) ? strip_tags((string) $article->description) : null,
                 );
             });
         } catch (\Exception $e) {
-            Log::error("{$this->getSourceName()} failed on " . implode(', ', $sourceCategories) . ": " . $e->getMessage());
+            Log::error("{$this->getSource()->label()} failed on " . implode(', ', $sourceCategories) . ": " . $e->getMessage());
             return collect();
         }
     }
@@ -72,8 +73,8 @@ class OpenNewsStrategy implements NewsFetcherInterface
     /**
      * @inheritdoc
      */
-    public function getSourceName(): string
+    public function getSource(): NewsSource
     {
-        return 'OpenNews';
+        return NewsSource::OPEN_NEWS;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Enums\ArticleCategory;
+use App\Enums\NewsSource;
 use App\Models\Article;
 use App\Services\News\Contracts\NewsFetcherInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,7 +17,7 @@ class FetchAndStoreNewsJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public string $fetcherClass,
+        public NewsSource $source,
         public ArticleCategory $category
     ) {}
 
@@ -25,7 +26,8 @@ class FetchAndStoreNewsJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $fetcher = app($this->fetcherClass);
+        $fetcherClass = $this->source->getStrategyClass();
+        $fetcher = app($fetcherClass);
 
         if (! $fetcher instanceof NewsFetcherInterface) {
             throw new \Exception('Invalid fetcher class');

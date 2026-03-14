@@ -4,6 +4,7 @@ namespace App\Services\News\Strategies;
 
 use App\DTOs\ArticleDTO;
 use App\Enums\ArticleCategory;
+use App\Enums\NewsSource;
 use App\Services\News\Contracts\CategoryMapperInterface;
 use App\Services\News\Contracts\NewsFetcherInterface;
 use Carbon\Carbon;
@@ -54,6 +55,11 @@ class NewsApiStrategy implements NewsFetcherInterface
                     'apiKey' => $this->apiKey,
                 ]);
 
+                if (!$response->successful()) {
+                    Log::error("{$this->getSource()->label()} fetch failed for category {$sourceCategory}: " . $response->body());
+                    continue;
+                }
+
                 $articles = $response->json()['articles'] ?? [];
 
                 $mappedArticles = collect($articles)->map(function ($article) use ($category) {
@@ -64,7 +70,7 @@ class NewsApiStrategy implements NewsFetcherInterface
                         imageUrl: $article['urlToImage'],
                         author: $article['author'],
                         url: $article['url'],
-                        source: $this->getSourceName(),
+                        source: $this->getSource(),
                         category: $category,
                         publishedAt: Carbon::parse($article['publishedAt']),
                     );
@@ -72,7 +78,7 @@ class NewsApiStrategy implements NewsFetcherInterface
 
                 $allArticles = $allArticles->concat($mappedArticles);
             } catch (\Exception $e) {
-                Log::error("NewsAPI fetch failed for category {$sourceCategory}: " . $e->getMessage());
+                Log::error("{$this->getSource()->label()} fetch Exception for category {$sourceCategory}: " . $e->getMessage());
             }
         }
 
@@ -82,8 +88,8 @@ class NewsApiStrategy implements NewsFetcherInterface
     /**
      * @inheritdoc
      */
-    public function getSourceName(): string
+    public function getSource(): NewsSource
     {
-        return 'NewsAPI';
+        return NewsSource::NEWS_API;
     }
 }

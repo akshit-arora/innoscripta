@@ -1,0 +1,249 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Innoscripta News API",
+        "description": "API documentation for the News Aggregation service",
+        "contact": {
+            "email": "support@innoscripta.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "Main API Server"
+        }
+    ],
+    "paths": {
+        "/api/articles": {
+            "get": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Get list of articles",
+                "description": "Returns list of articles with optional filtering and user preferences",
+                "operationId": "getArticlesList",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by title, description or content",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "description": "Filter by date (Y-m-d)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "Filter by category",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/components/schemas/ArticleCategory"
+                        }
+                    },
+                    {
+                        "name": "source",
+                        "in": "query",
+                        "description": "Filter by source",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/components/schemas/NewsSource"
+                        }
+                    },
+                    {
+                        "name": "preferences[sources][]",
+                        "in": "query",
+                        "description": "Preferred sources",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/NewsSource"
+                            }
+                        }
+                    },
+                    {
+                        "name": "preferences[categories][]",
+                        "in": "query",
+                        "description": "Preferred categories",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/ArticleCategory"
+                            }
+                        }
+                    },
+                    {
+                        "name": "preferences[authors][]",
+                        "in": "query",
+                        "description": "Preferred authors",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Article"
+                                            }
+                                        },
+                                        "links": {
+                                            "properties": {
+                                                "first": {
+                                                    "type": "string"
+                                                },
+                                                "last": {
+                                                    "type": "string"
+                                                },
+                                                "prev": {
+                                                    "type": "string"
+                                                },
+                                                "next": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "from": {
+                                                    "type": "integer"
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "path": {
+                                                    "type": "string"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "to": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ArticleCategory": {
+                "title": "Article Category",
+                "description": "Article category enum",
+                "type": "string",
+                "enum": [
+                    "business",
+                    "entertainment",
+                    "health",
+                    "science",
+                    "sports",
+                    "technology",
+                    "general"
+                ]
+            },
+            "NewsSource": {
+                "title": "News Source",
+                "description": "News source enum",
+                "type": "string",
+                "enum": [
+                    "news_api",
+                    "open_news",
+                    "ny_times"
+                ]
+            },
+            "Article": {
+                "title": "Article",
+                "description": "Article model",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Example Title"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Example Description"
+                    },
+                    "content": {
+                        "type": "string",
+                        "example": "Example Content"
+                    },
+                    "image_url": {
+                        "type": "string",
+                        "example": "https://example.com/image.jpg"
+                    },
+                    "author": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "url": {
+                        "type": "string",
+                        "example": "https://example.com/article"
+                    },
+                    "category": {
+                        "type": "string",
+                        "example": "technology"
+                    },
+                    "source": {
+                        "type": "string",
+                        "example": "news_api"
+                    },
+                    "published_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-03-14T21:55:00Z"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Articles",
+            "description": "Articles"
+        }
+    ]
+}
