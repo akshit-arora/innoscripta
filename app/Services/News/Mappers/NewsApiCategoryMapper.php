@@ -7,6 +7,9 @@ use App\Services\News\Contracts\CategoryMapperInterface;
 
 class NewsApiCategoryMapper implements CategoryMapperInterface
 {
+    /**
+     * @inheritdoc
+     */
     public function map(ArticleCategory $systemCategory): string
     {
         return match ($systemCategory) {
