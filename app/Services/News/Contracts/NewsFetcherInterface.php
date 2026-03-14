@@ -3,6 +3,7 @@
 namespace App\Services\News\Contracts;
 
 use App\Enums\ArticleCategory;
+use App\Enums\NewsSource;
 use Illuminate\Support\Collection;
 
 interface NewsFetcherInterface
@@ -18,9 +19,9 @@ interface NewsFetcherInterface
     /**
      * Get the name of the news source.
      *
-     * @return string
+     * @return NewsSource
      */
-    public function getSourceName(): string;
+    public function getSource(): NewsSource;
 
     /**
      * Check if the news source supports the given category.

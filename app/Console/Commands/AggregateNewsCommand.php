@@ -4,9 +4,7 @@ namespace App\Console\Commands;
 
 use App\Enums\ArticleCategory;
 use App\Jobs\FetchAndStoreNewsJob;
-use App\Services\News\Strategies\NewsApiStrategy;
-use App\Services\News\Strategies\NYTimesStrategy;
-use App\Services\News\Strategies\OpenNewsStrategy;
+use App\Enums\NewsSource;
 use Illuminate\Console\Command;
 
 class AggregateNewsCommand extends Command
@@ -25,12 +23,6 @@ class AggregateNewsCommand extends Command
      */
     protected $description = 'Dispatch jobs to fetch and store news from various sources';
 
-    protected array $sources = [
-        NewsApiStrategy::class,
-        OpenNewsStrategy::class,
-        NYTimesStrategy::class,
-    ];
-
     /**
      * Execute the console command.
      */
@@ -40,7 +32,8 @@ class AggregateNewsCommand extends Command
 
         $delayCounter = 0;
 
-        foreach ($this->sources as $sourceClass) {
+        foreach (NewsSource::cases() as $source) {
+            $sourceClass = $source->getStrategyClass();
             $fetcher = app($sourceClass);
 
             foreach (ArticleCategory::cases() as $category) {
@@ -52,7 +45,7 @@ class AggregateNewsCommand extends Command
                 $delay = now()->addSeconds($delayCounter * 5);
                 $this->line('Queued: ' . $sourceClass . ' for category ' . $category->value . ' with delay ' . $delay->diffForHumans());
 
-                FetchAndStoreNewsJob::dispatch($sourceClass, $category)->delay($delay);
+                FetchAndStoreNewsJob::dispatch($source, $category)->delay($delay);
 
                 $delayCounter++;
             }

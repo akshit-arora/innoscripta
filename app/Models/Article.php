@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ArticleCategory;
+use App\Enums\NewsSource;
 use Illuminate\Database\Eloquent\Model;
 
 class Article extends Model
@@ -32,5 +33,6 @@ class Article extends Model
     protected $casts = [
         'published_at' => 'datetime',
         'category' => ArticleCategory::class,
+        'source' => NewsSource::class,
     ];
 }

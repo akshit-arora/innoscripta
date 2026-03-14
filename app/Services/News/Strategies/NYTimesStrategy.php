@@ -4,6 +4,7 @@ namespace App\Services\News\Strategies;
 
 use App\DTOs\ArticleDTO;
 use App\Enums\ArticleCategory;
+use App\Enums\NewsSource;
 use App\Services\News\Contracts\CategoryMapperInterface;
 use App\Services\News\Contracts\NewsFetcherInterface;
 use Carbon\Carbon;
@@ -74,7 +75,7 @@ class NYTimesStrategy implements NewsFetcherInterface
                         imageUrl: $imageUrl,
                         author: $article['byline'],
                         url: $article['url'],
-                        source: $this->getSourceName(),
+                        source: $this->getSource(),
                         category: $category,
                         publishedAt: Carbon::parse($article['published_date']),
                     );
@@ -82,7 +83,7 @@ class NYTimesStrategy implements NewsFetcherInterface
 
                 $allArticles = $allArticles->concat($mappedArticles);
             } catch (\Exception $e) {
-                Log::error("NYTimes fetch exception for category {$sourceCategory}: " . $e->getMessage());
+                Log::error("{$this->getSource()->label()} fetch exception for category {$sourceCategory}: " . $e->getMessage());
             }
         }
 
@@ -92,8 +93,8 @@ class NYTimesStrategy implements NewsFetcherInterface
     /**
      * @inheritdoc
      */
-    public function getSourceName(): string
+    public function getSource(): NewsSource
     {
-        return 'NYTimes';
+        return NewsSource::NY_TIMES;
     }
 }
