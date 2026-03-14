@@ -35,4 +35,18 @@ return [
         ],
     ],
 
+    'news_sources' => [
+        'newsapi' => [
+            'api_key' => env('NEWSAPI_API_KEY'),
+            'base_url' => 'https://newsapi.org/v2',
+        ],
+        'opennews' => [
+            'rss_feed_url' => 'https://source.opennews.org/rss/',
+        ],
+        'nytimes' => [
+            'api_key' => env('NYTIMES_API_KEY'),
+            'base_url' => 'https://api.nytimes.com/svc',
+        ]
+    ]
+
 ];

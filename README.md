@@ -1,59 +1,126 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# News Aggregator API for Innoscripta Case Study
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A RESTful API built with Laravel for aggregating news from multiple sources (NewsAPI, The New York Times, OpenNews) and providing a unified, searchable, and filterable interface for clients.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Multi-Source Aggregation**: Fetches articles from various external news APIs.
+- **Unified Article Format**: standardizes diverse structured data into a consistent internal model (`ArticleDTO`).
+- **Advanced Filtering**: Enables searching by keyword, and filtering by category, source, date, and user preferences.
+- **Automated Fetching**: Uses Laravel Queues and Jobs (`FetchAndStoreNewsJob`) to periodically pull and upsert articles into the database.
+- **Extensible Architecture**: Utilizes Strategy and Mapper design patterns to easily add more news sources in the future.
+- **Comprehensive Testing**: Fully tested using the Pest PHP testing framework.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requirements
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.2+
+- Composer
+- SQLite / MySQL / PostgreSQL (SQLite is used by default)
+- Ext-curl or similar HTTP client extension for PHP
 
-## Learning Laravel
+## Installation & Setup
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd innoscripta
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. **Install dependencies:**
+   ```bash
+   composer install
+   ```
 
-## Laravel Sponsors
+3. **Configure the environment:**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+4. **Set up Database (SQLite by default):**
+   ```bash
+   touch database/database.sqlite
+   php artisan migrate
+   ```
 
-### Premium Partners
+5. **Configure API Keys:**
+   Add your API keys to the `.env` file for the supported news sources:
+   ```env
+   NEWSAPI_API_KEY="your_newsapi_key_here"
+   NYTIMES_API_KEY="your_nytimes_key_here"
+   ```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Usage
 
-## Contributing
+### Running the Application
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+To start the local development server:
+```bash
+php artisan serve
+```
 
-## Code of Conduct
+To run the queue worker (required to process the background jobs fetching the news):
+```bash
+php artisan queue:listen
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Fetching News Manually
+To dispatch jobs to fetch news immediately:
+```bash
+php artisan news:aggregate
+```
 
-## Security Vulnerabilities
+### Automated Fetching
+The application is pre-configured to fetch news once every day. This is managed in `bootstrap/app.php` using Laravel's task scheduler. To run the scheduler locally:
+```bash
+php artisan schedule:work
+```
+In a production environment, you should add a single cron entry to your server:
+```bash
+* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## API Endpoints
 
-## License
+### `GET /api/articles`
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Returns a paginated list of articles.
+
+**Query Parameters (Optional):**
+
+- `search` (string): Search by title, description or content.
+- `date` (string, `Y-m-d` format): Filter articles published on a specific date.
+- `category` (string): Filter by category (e.g., `technology`, `business`, `sports`).
+- `source` (string): Filter by source (e.g., `news_api`, `ny_times`, `open_news`).
+- `preferences[sources][]` (array): Array of preferred sources.
+- `preferences[categories][]` (array): Array of preferred categories.
+- `preferences[authors][]` (array): Array of preferred authors.
+
+**Example Request:**
+```
+GET /api/articles?category=technology&search=AI
+```
+
+## Testing
+
+The application uses [Pest](https://pestphp.com/) for testing. 
+
+To run the test suite:
+```bash
+php artisan test
+```
+
+Tests include coverage for:
+- API endpoints (`ArticleControllerTest`)
+- API fetch strategies & mappers
+- Data Transfer Objects (`ArticleDTOTest`)
+- Background jobs (`FetchAndStoreNewsJobTest`)
+
+## Architecture Description
+
+The application fetches data from multiple APIs natively via robust abstractions:
+
+*   **Strategies**: Implement `NewsFetcherInterface` allowing uniform interaction with vastly different external structures (e.g. `NewsApiStrategy`, `NYTimesStrategy`, `OpenNewsStrategy`).
+*   **Mappers**: Conform different category naming logic per API source into a unified system enum (`ArticleCategory`).
+*   **DTOs**: The `ArticleDTO` translates diverse external schemas to a cohesive internal model.
+*   **Database Upserts**: Safe periodic operations, avoiding duplicated entries leveraging URL identification.
