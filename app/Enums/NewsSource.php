@@ -5,7 +5,15 @@ namespace App\Enums;
 use App\Services\News\Strategies\NewsApiStrategy;
 use App\Services\News\Strategies\OpenNewsStrategy;
 use App\Services\News\Strategies\NYTimesStrategy;
+use OpenApi\Attributes as OA;
 
+#[OA\Schema(
+    schema: "NewsSource",
+    title: "News Source",
+    description: "News source enum",
+    type: "string",
+    enum: ["news_api", "open_news", "ny_times"]
+)]
 enum NewsSource: string
 {
     case NEWS_API = 'news_api';

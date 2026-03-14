@@ -6,7 +6,25 @@ use App\Enums\ArticleCategory;
 use App\Enums\NewsSource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use OpenApi\Attributes as OA;
 
+#[OA\Schema(
+    schema: "Article",
+    title: "Article",
+    description: "Article model",
+    properties: [
+        new OA\Property(property: "id", type: "integer", example: 1),
+        new OA\Property(property: "title", type: "string", example: "Example Title"),
+        new OA\Property(property: "description", type: "string", example: "Example Description"),
+        new OA\Property(property: "content", type: "string", example: "Example Content"),
+        new OA\Property(property: "image_url", type: "string", example: "https://example.com/image.jpg"),
+        new OA\Property(property: "author", type: "string", example: "John Doe"),
+        new OA\Property(property: "url", type: "string", example: "https://example.com/article"),
+        new OA\Property(property: "category", type: "string", example: "technology"),
+        new OA\Property(property: "source", type: "string", example: "news_api"),
+        new OA\Property(property: "published_at", type: "string", format: "date-time", example: "2024-03-14T21:55:00Z"),
+    ]
+)]
 class Article extends Model
 {
     /**
