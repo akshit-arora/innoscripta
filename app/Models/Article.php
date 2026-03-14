@@ -2,11 +2,16 @@
 
 namespace App\Models;
 
-use App\Enums\Category;
+use App\Enums\ArticleCategory;
 use Illuminate\Database\Eloquent\Model;
 
 class Article extends Model
 {
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'title',
         'description',
@@ -19,8 +24,13 @@ class Article extends Model
         'source',
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
     protected $casts = [
         'published_at' => 'datetime',
-        'category' => Category::class,
+        'category' => ArticleCategory::class,
     ];
 }
